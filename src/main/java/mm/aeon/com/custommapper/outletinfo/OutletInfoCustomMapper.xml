@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mm.aeon.com.custommapper.outletinfo.OutletInfoCustomMapper">
+
+	<resultMap id="outletInfoResultMap" type="mm.aeon.com.dto.outletinfo.OutletInfoDto">
+		<id column="OUTLET_ID" jdbcType="INTEGER" property="outletId" />
+		<result column="OUTLET_NAME" jdbcType="VARCHAR" property="outletName" />
+		<result column="OUTLET_ADDRESS" jdbcType="VARCHAR" property="outletAddress" />
+		<result column="IMAGE_PATH" jdbcType="VARCHAR" property="imagePath" />
+		<result column="LONGITUDE" jdbcType="VARCHAR" property="longitude" />
+		<result column="LATITUDE" jdbcType="VARCHAR" property="latitude" />
+		<result column="PHONE_NO" jdbcType="VARCHAR" property="phoneNo" />
+		<result column="ISAEON" jdbcType="BOOLEAN" property="isAeon" />
+		<result column="ROLE_ID" jdbcType="INTEGER" property="roleId" />
+	</resultMap>
+  
+  <select id="getOutletInfoList" resultMap="outletInfoResultMap">
+	SELECT DISTINCT
+		OI.ID AS OUTLET_ID, 
+		OI.OUTLET_NAME, 
+		OI.ADDRESS AS OUTLET_ADDRESS, 
+		OI.IMAGE_PATH, 
+		OI.LONGITUDE, 
+		OI.LATITUDE, 
+		OI.PHONE_NO, 
+		AI.ISAEON,
+		CASE WHEN (SELECT COUNT(*) FROM role_info SRI LEFT JOIN agency_role SAR ON SRI.ID = SAR.ROLE_ID LEFT JOIN agency_info SAI ON SAR.AGENCY_ID = SAI.ID WHERE SAI.ID = AI.ID AND SAR.ISVALID = 1) > 1 THEN 5
+		ELSE RI.ID END AS ROLE_ID
+	FROM 
+		outlet_info OI 
+	LEFT JOIN 
+		agency_outlet AO 
+	ON 
+		OI.ID = AO.OUTLET_ID 
+	LEFT JOIN 
+		agency_info AI 
+	ON 
+		AO.AGENCY_ID = AI.ID 
+	LEFT JOIN 
+		agency_role AR 
+	ON 
+		AI.ID = AR.AGENCY_ID 
+	LEFT JOIN 
+		ASS.ROLE_INFO RI 
+	ON 
+		AR.ROLE_ID = RI.ID 
+	WHERE 
+		OI.ISVALID = 1 
+	AND 
+		AO.OUTLET_VALID = 1 
+	AND 
+		AI.ISVALID = 1 
+	AND 
+		AR.ISVALID = 1 
+	AND 
+		RI.ISVALID = 1
+	AND
+		OI.LONGITUDE IS NOT NULL
+	AND
+		OI.LONGITUDE != ''
+	AND
+		OI.LATITUDE IS NOT NULL
+	AND
+		OI.LATITUDE != ''
+	GROUP BY
+		OI.ID,
+		AI.ISAEON,
+		AR.ROLE_ID,
+		AI.ID,
+		RI.ID
+	ORDER BY 
+		OI.OUTLET_NAME
+	</select>
+	
+	
+  
+</mapper>

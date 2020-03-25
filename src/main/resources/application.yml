@@ -1,0 +1,14 @@
+#DataSource Configuration
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://172.16.112.35:5432/ass_production?useUnicode=true&characterEncoding=utf8
+    username: ass
+    password: ass-2018
+server:
+  servlet:
+    contextPath: /api
+properties:
+  imageBaseFilePath: /mnt/uploadImage
+  outletImageFolder: /OutletImage/
+  outletLimitMetre: 1000
